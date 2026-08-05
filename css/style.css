@@ -1,0 +1,186 @@
+/* ===== 基本設定 ===== */
+:root {
+  --bg: #faf6f0;
+  --bg-elevated: #ffffff;
+  --bg-card: #ffffff;
+  --border: #e6ddd0;
+  --text: #241a12;
+  --text-dim: #6b5d4f;
+  --accent: #e0631e;
+  --accent-dim: #e0631e26;
+  --accent2: #0f8a7a;
+  --font: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN",
+    "Yu Gothic", Meiryo, sans-serif;
+  --radius: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1024;
+    --bg-elevated: #241831;
+    --bg-card: #2a1d3a;
+    --border: #3a2a4d;
+    --text: #f2ecf7;
+    --text-dim: #a897b8;
+    --accent: #ff8c42;
+    --accent-dim: #ff8c4233;
+    --accent2: #3ddbc4;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+img, svg { max-width: 100%; }
+
+/* ===== ヘッダー ===== */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  padding: calc(12px + env(safe-area-inset-top)) 16px 12px;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+.brand { font-weight: 800; letter-spacing: 0.04em; font-size: 16px; color: var(--text); }
+.brand:hover { text-decoration: none; color: var(--accent); }
+
+/* ===== メインビュー ===== */
+.view {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+  min-height: 70vh;
+}
+
+.page-title { font-size: 22px; margin: 0 0 4px; }
+.page-lead { color: var(--text-dim); margin: 0 0 16px; font-size: 14px; }
+.section-title { font-size: 16px; margin: 28px 0 10px; }
+
+.loading, .empty-state, .empty-hint {
+  text-align: center;
+  color: var(--text-dim);
+  padding: 40px 16px;
+}
+
+/* ===== フィルタ ===== */
+.filter-bar { display: flex; gap: 8px; margin-bottom: 10px; }
+.filter-bar input[type="search"] {
+  flex: 1;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 15px;
+}
+
+.filter-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.chip {
+  min-height: 36px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-dim);
+  font-size: 13px;
+  cursor: pointer;
+}
+.chip.active { color: #fff; background: var(--accent); border-color: var(--accent); }
+
+.result-count { color: var(--text-dim); font-size: 13px; margin: 8px 0; }
+
+/* ===== 映画グリッド / カード ===== */
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 14px;
+}
+.movie-card {
+  display: block;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.movie-card:hover { text-decoration: none; border-color: var(--accent); }
+.poster { display: block; width: 100%; aspect-ratio: 2 / 3; object-fit: cover; background: var(--bg-elevated); }
+.poster-placeholder { display: flex; align-items: center; justify-content: center; }
+.movie-card-body { padding: 8px 10px 12px; }
+.movie-card-title { display: block; font-size: 14px; font-weight: 600; line-height: 1.3; }
+.movie-card-meta { display: block; font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+
+/* ===== 詳細ページ ===== */
+.detail-header { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 12px; }
+.detail-poster { width: 200px; max-width: 40vw; aspect-ratio: 2 / 3; object-fit: cover; border-radius: var(--radius); background: var(--bg-elevated); flex: none; }
+.detail-header-info { flex: 1; min-width: 220px; }
+.detail-header-info h1 { margin: 0 0 4px; font-size: 22px; }
+.detail-original-title { color: var(--text-dim); margin: 0 0 10px; font-size: 14px; }
+.detail-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.detail-meta .chip { cursor: default; }
+.detail-overview { line-height: 1.7; color: var(--text-dim); }
+
+.cast-list, .song-list { list-style: none; margin: 0; padding: 0; }
+.cast-list li {
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.cast-name { font-weight: 600; }
+.cast-character { color: var(--text-dim); }
+
+.song-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--border);
+}
+.song-info { display: flex; flex-direction: column; }
+.song-title { font-size: 14px; font-weight: 600; }
+.song-singers { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 13px;
+  white-space: nowrap;
+}
+.btn:hover { text-decoration: none; border-color: var(--accent); color: var(--accent); }
+
+/* ===== フッター ===== */
+.app-footer {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 12px;
+  padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border);
+}

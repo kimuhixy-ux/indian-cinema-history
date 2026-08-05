@@ -1,0 +1,5 @@
+api_key.txt
+movies_progress.json
+songs_progress.json
+*.log
+.DS_Store
