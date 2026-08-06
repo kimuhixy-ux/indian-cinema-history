@@ -45,6 +45,7 @@ export async function renderMovieDetail(view, slug) {
     }
 
     <h2 class="section-title">楽曲</h2>
+    ${movie.songs && movie.songs.length ? `<p class="song-caveat">お住まいの地域によっては、JioSaavn側の都合で再生できない場合があります</p>` : ""}
     ${songsHtml(movie)}
   `;
 }
