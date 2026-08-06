@@ -5,7 +5,7 @@ import { movieCardHtml } from "../components/movie-card.js";
 import { escapeHtml } from "../router.js";
 
 export async function renderMovies(view, queryString) {
-  view.innerHTML = `<div class="loading">読み込み中...</div>`;
+  view.innerHTML = `<div class="loading">読み込み中...<br><span class="loading-hint">初回読み込みは通信環境によって時間がかかる場合があります</span></div>`;
   const { movies, industries } = await loadData();
   const params = new URLSearchParams(queryString || "");
 
