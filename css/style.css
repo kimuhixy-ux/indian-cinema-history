@@ -148,13 +148,6 @@ img, svg { max-width: 100%; }
 .detail-meta .chip { cursor: default; }
 .detail-overview { line-height: 1.7; color: var(--text-dim); }
 
-.song-caveat {
-  font-size: 12px;
-  color: var(--text-dim);
-  opacity: 0.8;
-  margin: -4px 0 12px;
-}
-
 .cast-list, .song-list { list-style: none; margin: 0; padding: 0; }
 .cast-list li {
   padding: 10px 4px;

@@ -45,7 +45,6 @@ export async function renderMovieDetail(view, slug) {
     }
 
     <h2 class="section-title">楽曲</h2>
-    ${movie.songs && movie.songs.length ? `<p class="song-caveat">お住まいの地域によっては、JioSaavn側の都合で再生できない場合があります</p>` : ""}
     ${songsHtml(movie)}
   `;
 }
@@ -55,16 +54,18 @@ function songsHtml(movie) {
     return `<p class="empty-hint">楽曲のデータがありません</p>`;
   }
   const rows = movie.songs
-    .map(
-      (s) => `
+    .map((s) => {
+      const query = encodeURIComponent(`${s.title} ${movie.title}`);
+      const youtubeUrl = `https://www.youtube.com/results?search_query=${query}`;
+      return `
       <li class="song-row">
         <div class="song-info">
           <span class="song-title">${escapeHtml(s.title)}</span>
           ${s.singers ? `<span class="song-singers">${escapeHtml(s.singers)}</span>` : ""}
         </div>
-        ${s.url ? `<a class="btn song-link" href="${escapeHtml(s.url)}" target="_blank" rel="noopener">再生</a>` : ""}
-      </li>`
-    )
+        <a class="btn song-link" href="${youtubeUrl}" target="_blank" rel="noopener">YouTubeで探す</a>
+      </li>`;
+    })
     .join("");
   return `<ul class="song-list">${rows}</ul>`;
 }
