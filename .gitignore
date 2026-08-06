@@ -3,3 +3,4 @@ movies_progress.json
 songs_progress.json
 *.log
 .DS_Store
+data/movies.json

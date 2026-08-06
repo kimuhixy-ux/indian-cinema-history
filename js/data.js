@@ -1,22 +1,29 @@
-// data.js: movies.jsonの読み込みとキャッシュ
+// data.js: movies-index.json(一覧用の軽量データ)の読み込みと、
+// 映画ごとの詳細JSON(data/movies/<tmdb_id>.json)の個別取得を行う
 
-let cache = null;
+let indexCache = null;
+const detailCache = new Map();
 
 export async function loadData() {
-  if (cache) return cache;
-  const movies = await fetch("data/movies.json").then((r) => r.json());
+  if (indexCache) return indexCache;
+  const movies = await fetch("data/movies-index.json").then((r) => r.json());
 
-  // tmdb_idは一意なのでそのままslugとして使う(同名映画・リメイクでの衝突を避けるため)
   for (const movie of movies) {
     movie.slug = String(movie.tmdb_id);
   }
 
   const industries = [...new Set(movies.map((m) => m.industry))].sort();
 
-  cache = { movies, industries };
-  return cache;
+  indexCache = { movies, industries };
+  return indexCache;
 }
 
-export function findMovieBySlug(movies, slug) {
-  return movies.find((m) => m.slug === slug);
+export async function loadMovieDetail(tmdbId) {
+  if (detailCache.has(tmdbId)) return detailCache.get(tmdbId);
+  const movie = await fetch(`data/movies/${encodeURIComponent(tmdbId)}.json`).then((r) => {
+    if (!r.ok) return null;
+    return r.json();
+  });
+  if (movie) detailCache.set(tmdbId, movie);
+  return movie;
 }

@@ -1,12 +1,11 @@
 // movie-detail.js: 映画詳細ページ
 
-import { loadData, findMovieBySlug } from "../data.js";
+import { loadMovieDetail } from "../data.js";
 import { escapeHtml } from "../router.js";
 
 export async function renderMovieDetail(view, slug) {
   view.innerHTML = `<div class="loading">読み込み中...</div>`;
-  const { movies } = await loadData();
-  const movie = findMovieBySlug(movies, slug);
+  const movie = await loadMovieDetail(slug);
 
   if (!movie) {
     view.innerHTML = `<div class="empty-state">映画が見つかりませんでした<br><a href="#/movies">一覧に戻る</a></div>`;

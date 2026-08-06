@@ -55,8 +55,7 @@ export async function renderMovies(view, queryString) {
       list = list.filter(
         (m) =>
           m.title.toLowerCase().includes(q) ||
-          (m.original_title || "").toLowerCase().includes(q) ||
-          (m.cast || []).some((c) => c.name.toLowerCase().includes(q))
+          (m.lead_actor || "").toLowerCase().includes(q)
       );
     }
     list = [...list].sort((a, b) => (b.release_year ?? 0) - (a.release_year ?? 0) || a.title.localeCompare(b.title));
