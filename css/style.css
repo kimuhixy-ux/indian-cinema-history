@@ -102,6 +102,19 @@ img, svg { max-width: 100%; }
   font-size: 15px;
 }
 
+.year-filter input[type="number"] {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 15px;
+}
+.year-filter-sep { color: var(--text-dim); align-self: center; }
+
 .filter-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
 .chip {
   min-height: 36px;
