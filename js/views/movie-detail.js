@@ -57,13 +57,17 @@ function songsHtml(movie) {
     .map((s) => {
       const query = encodeURIComponent(`${s.title} ${movie.title}`);
       const youtubeUrl = `https://www.youtube.com/results?search_query=${query}`;
+      const spotifyUrl = `https://open.spotify.com/search/${query}`;
       return `
       <li class="song-row">
         <div class="song-info">
           <span class="song-title">${escapeHtml(s.title)}</span>
           ${s.singers ? `<span class="song-singers">${escapeHtml(s.singers)}</span>` : ""}
         </div>
-        <a class="btn song-link" href="${youtubeUrl}" target="_blank" rel="noopener">YouTubeで探す</a>
+        <div class="song-links">
+          <a class="btn song-link" href="${spotifyUrl}" target="_blank" rel="noopener">Spotifyで探す</a>
+          <a class="btn song-link" href="${youtubeUrl}" target="_blank" rel="noopener">YouTubeで探す</a>
+        </div>
       </li>`;
     })
     .join("");

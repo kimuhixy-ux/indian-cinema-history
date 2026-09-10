@@ -14,6 +14,7 @@ export async function renderMovies(view, queryString) {
     industry: params.get("industry") || "",
     yearFrom: params.get("yearFrom") || "",
     yearTo: params.get("yearTo") || "",
+    actorLetter: params.get("actorLetter") || "",
   };
 
   view.innerHTML = `
@@ -29,6 +30,8 @@ export async function renderMovies(view, queryString) {
       <input type="number" id="yearToInput" placeholder="公開年(まで)" value="${escapeHtml(state.yearTo)}">
     </div>
     <div class="filter-row" id="industryRow"></div>
+    <p class="filter-label">主演俳優(頭文字)</p>
+    <div class="filter-row letter-row" id="letterRow"></div>
     <div class="result-count" id="resultCount"></div>
     <div class="movie-grid" id="results"></div>
   `;
@@ -37,11 +40,17 @@ export async function renderMovies(view, queryString) {
   const yearFromInput = view.querySelector("#yearFromInput");
   const yearToInput = view.querySelector("#yearToInput");
   const industryRow = view.querySelector("#industryRow");
+  const letterRow = view.querySelector("#letterRow");
   const resultsEl = view.querySelector("#results");
   const countEl = view.querySelector("#resultCount");
 
   const INDUSTRIES = [["", "すべて"], ...industries.map((i) => [i, i])];
   industryRow.innerHTML = INDUSTRIES.map(([v, l]) => chipHtml(v, l, state.industry)).join("");
+
+  const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  letterRow.innerHTML = [chipHtml("", "すべて", state.actorLetter)]
+    .concat(LETTERS.map((l) => chipHtml(l, l, state.actorLetter)))
+    .join("");
 
   function chipHtml(value, label, current) {
     const active = value === current ? " active" : "";
@@ -54,6 +63,7 @@ export async function renderMovies(view, queryString) {
     if (state.industry) p.set("industry", state.industry);
     if (state.yearFrom) p.set("yearFrom", state.yearFrom);
     if (state.yearTo) p.set("yearTo", state.yearTo);
+    if (state.actorLetter) p.set("actorLetter", state.actorLetter);
     const qs = p.toString();
     history.replaceState(null, "", `#/movies${qs ? "?" + qs : ""}`);
   }
@@ -68,6 +78,9 @@ export async function renderMovies(view, queryString) {
           m.title.toLowerCase().includes(q) ||
           (m.lead_actor || "").toLowerCase().includes(q)
       );
+    }
+    if (state.actorLetter) {
+      list = list.filter((m) => (m.lead_actor || "").trim().charAt(0).toUpperCase() === state.actorLetter);
     }
     if (state.yearFrom) list = list.filter((m) => (m.release_year ?? 0) >= Number(state.yearFrom));
     if (state.yearTo) list = list.filter((m) => (m.release_year ?? 0) <= Number(state.yearTo));
@@ -98,10 +111,18 @@ export async function renderMovies(view, queryString) {
     debounceTimer = setTimeout(applyFilters, 200);
   });
 
-  view.querySelectorAll(".chip[data-value]").forEach((btn) => {
+  industryRow.querySelectorAll(".chip[data-value]").forEach((btn) => {
     btn.addEventListener("click", () => {
       state.industry = btn.dataset.value;
-      view.querySelectorAll(".chip[data-value]").forEach((b) => b.classList.toggle("active", b === btn));
+      industryRow.querySelectorAll(".chip[data-value]").forEach((b) => b.classList.toggle("active", b === btn));
+      applyFilters();
+    });
+  });
+
+  letterRow.querySelectorAll(".chip[data-value]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.actorLetter = btn.dataset.value;
+      letterRow.querySelectorAll(".chip[data-value]").forEach((b) => b.classList.toggle("active", b === btn));
       applyFilters();
     });
   });

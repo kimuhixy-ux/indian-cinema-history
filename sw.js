@@ -1,6 +1,6 @@
 // sw.js: オフライン閲覧のためのService Worker
 // データやコードを更新したら CACHE_VERSION を必ず上げること(上げ忘れると端末に古い版が残る)
-const CACHE_VERSION = "indian-cinema-history-v6";
+const CACHE_VERSION = "indian-cinema-history-v7";
 
 const PRECACHE_URLS = [
   "./",
@@ -11,8 +11,10 @@ const PRECACHE_URLS = [
   "./js/router.js",
   "./js/data.js",
   "./js/components/movie-card.js",
+  "./js/components/year-list-item.js",
   "./js/views/movies.js",
   "./js/views/movie-detail.js",
+  "./js/views/timeline.js",
   "./data/movies-index.json",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
