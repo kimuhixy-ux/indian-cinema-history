@@ -7,7 +7,7 @@ import { renderTimeline } from "./views/timeline.js";
 
 addRoute(/^#\/movies(?:\?(.*))?$/, renderMovies);
 addRoute(/^#\/movie\/([^/]+)$/, renderMovieDetail);
-addRoute(/^#\/timeline$/, renderTimeline);
+addRoute(/^#\/timeline(?:\?(.*))?$/, renderTimeline);
 addRoute(/^#\/?$/, renderMovies);
 
 startRouter();

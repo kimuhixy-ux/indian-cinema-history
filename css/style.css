@@ -220,46 +220,20 @@ img, svg { max-width: 100%; }
 }
 .btn:hover { text-decoration: none; border-color: var(--accent); color: var(--accent); }
 
-/* ===== 年代別ビュー ===== */
-.decade-block {
-  border: 1px solid var(--border);
+/* ===== 年別ビュー ===== */
+.year-picker select {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 12px;
   border-radius: var(--radius);
-  margin-bottom: 10px;
+  border: 1px solid var(--border);
   background: var(--bg-elevated);
-}
-.decade-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  min-height: 44px;
-  padding: 10px 14px;
-  cursor: pointer;
-  list-style: none;
-}
-.decade-header::-webkit-details-marker { display: none; }
-.decade-year { font-weight: 700; font-size: 15px; }
-
-.year-list { list-style: none; margin: 0; padding: 0 8px 8px; }
-.year-item { border-top: 1px solid var(--border); }
-.year-item-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  width: 100%;
-  min-height: 44px;
-  padding: 8px 6px;
-  background: none;
-  border: none;
   color: var(--text);
-  font-size: 14px;
-  text-align: left;
+  font-size: 16px;
 }
-.year-item-name { flex: 1; }
-.year-item-year { color: var(--text-dim); font-size: 12px; flex: none; }
-.year-item-preview { padding: 4px 6px 12px; }
-.year-item-poster { display: block; width: 120px; aspect-ratio: 2 / 3; object-fit: cover; border-radius: var(--radius); }
+.year-step { min-width: 44px; min-height: 44px; justify-content: center; }
+.year-step:disabled { opacity: 0.4; }
 
 /* ===== フッター ===== */
 .app-footer {
