@@ -18,6 +18,11 @@ function countByYear(movies) {
   return [...counts.entries()].sort((a, b) => b[0] - a[0]);
 }
 
+// 言語圏を切り替えたとき、選んでいた年に作品がなければ最も近い年へ移す(0件表示を避けるため)
+function nearestYear(years, target) {
+  return years.reduce((best, y) => (Math.abs(y - target) < Math.abs(best - target) ? y : best), years[0]);
+}
+
 function chipHtml(value, label, current) {
   const active = value === current ? " active" : "";
   return `<button type="button" class="chip${active}" data-value="${escapeHtml(value)}">${escapeHtml(label)}</button>`;
@@ -25,26 +30,26 @@ function chipHtml(value, label, current) {
 
 export async function renderTimeline(view, queryString) {
   view.innerHTML = `<div class="loading">読み込み中...<br><span class="loading-hint">初回読み込みは通信環境によって時間がかかる場合があります</span></div>`;
-  const { movies } = await loadData();
-  const yearCounts = countByYear(movies);
-  const years = yearCounts.map(([y]) => y);
+  const { movies, industries } = await loadData();
   const params = new URLSearchParams(queryString || "");
+  const requestedIndustry = params.get("industry") || "";
 
-  const requestedYear = Number(params.get("year"));
   const state = {
-    year: years.includes(requestedYear) ? requestedYear : years[0],
+    industry: industries.includes(requestedIndustry) ? requestedIndustry : "",
+    year: Number(params.get("year")),
     actorLetter: params.get("actorLetter") || "",
   };
 
   view.innerHTML = `
     <h1 class="page-title">年別</h1>
-    <p class="page-lead">公開年を選ぶと、その年の映画をサムネイルで表示します。</p>
+    <p class="page-lead">公開年を選ぶと、その年の映画をサムネイルで表示します。言語圏や主演俳優の頭文字でも絞り込めます。</p>
     <div class="filter-bar year-picker">
       <button type="button" class="btn year-step" id="olderBtn" aria-label="前の年">◀</button>
-      <select id="yearSelect">
-        ${yearCounts.map(([y, n]) => `<option value="${y}">${y}年(${n}本)</option>`).join("")}
-      </select>
+      <select id="yearSelect"></select>
       <button type="button" class="btn year-step" id="newerBtn" aria-label="次の年">▶</button>
+    </div>
+    <div class="filter-row" id="industryRow">
+      ${[["", "すべて"], ...industries.map((i) => [i, i])].map(([v, l]) => chipHtml(v, l, state.industry)).join("")}
     </div>
     <p class="filter-label">主演俳優(頭文字)</p>
     <div class="filter-row letter-row" id="letterRow">
@@ -57,7 +62,18 @@ export async function renderTimeline(view, queryString) {
   const yearSelect = view.querySelector("#yearSelect");
   const olderBtn = view.querySelector("#olderBtn");
   const newerBtn = view.querySelector("#newerBtn");
+  const industryRow = view.querySelector("#industryRow");
   const letterRow = view.querySelector("#letterRow");
+  let years = [];
+
+  // 年の選択肢と本数は、選択中の言語圏に作品がある年だけにする
+  function rebuildYearOptions() {
+    const base = state.industry ? movies.filter((m) => m.industry === state.industry) : movies;
+    const yearCounts = countByYear(base);
+    years = yearCounts.map(([y]) => y);
+    yearSelect.innerHTML = yearCounts.map(([y, n]) => `<option value="${y}">${y}年(${n}本)</option>`).join("");
+    if (!years.includes(state.year)) state.year = state.year ? nearestYear(years, state.year) : years[0];
+  }
   const resultsEl = view.querySelector("#results");
   const countEl = view.querySelector("#resultCount");
 
@@ -69,6 +85,7 @@ export async function renderTimeline(view, queryString) {
     newerBtn.disabled = idx === 0;
 
     let list = movies.filter((m) => m.release_year === state.year);
+    if (state.industry) list = list.filter((m) => m.industry === state.industry);
     if (state.actorLetter) {
       list = list.filter((m) => (m.lead_actor || "").trim().charAt(0).toUpperCase() === state.actorLetter);
     }
@@ -80,6 +97,7 @@ export async function renderTimeline(view, queryString) {
       : `<p class="empty-hint">該当する映画がありません</p>`;
 
     const p = new URLSearchParams({ year: String(state.year) });
+    if (state.industry) p.set("industry", state.industry);
     if (state.actorLetter) p.set("actorLetter", state.actorLetter);
     // replaceState にするのは、年を切り替えるたびに戻るボタンの履歴が増えないようにするため
     history.replaceState(null, "", `#/timeline?${p}`);
@@ -99,6 +117,15 @@ export async function renderTimeline(view, queryString) {
   olderBtn.addEventListener("click", () => stepYear(1));
   newerBtn.addEventListener("click", () => stepYear(-1));
 
+  industryRow.querySelectorAll(".chip[data-value]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.industry = btn.dataset.value;
+      industryRow.querySelectorAll(".chip[data-value]").forEach((b) => b.classList.toggle("active", b === btn));
+      rebuildYearOptions();
+      applyFilters();
+    });
+  });
+
   letterRow.querySelectorAll(".chip[data-value]").forEach((btn) => {
     btn.addEventListener("click", () => {
       state.actorLetter = btn.dataset.value;
@@ -107,5 +134,6 @@ export async function renderTimeline(view, queryString) {
     });
   });
 
+  rebuildYearOptions();
   applyFilters();
 }
