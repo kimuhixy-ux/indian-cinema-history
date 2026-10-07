@@ -12,8 +12,7 @@ export async function renderMovies(view, queryString) {
   const state = {
     q: params.get("q") || "",
     industry: params.get("industry") || "",
-    yearFrom: params.get("yearFrom") || "",
-    yearTo: params.get("yearTo") || "",
+    year: params.get("year") || "",
     actorLetter: params.get("actorLetter") || "",
   };
 
@@ -25,9 +24,7 @@ export async function renderMovies(view, queryString) {
       <input type="search" id="qInput" placeholder="タイトルで検索" value="${escapeHtml(state.q)}">
     </div>
     <div class="filter-bar year-filter">
-      <input type="number" id="yearFromInput" placeholder="公開年(から)" value="${escapeHtml(state.yearFrom)}">
-      <span class="year-filter-sep">〜</span>
-      <input type="number" id="yearToInput" placeholder="公開年(まで)" value="${escapeHtml(state.yearTo)}">
+      <input type="number" id="yearInput" inputmode="numeric" placeholder="制作年(例: 1975)" value="${escapeHtml(state.year)}">
     </div>
     <div class="filter-row" id="industryRow"></div>
     <p class="filter-label">主演俳優(頭文字)</p>
@@ -37,8 +34,7 @@ export async function renderMovies(view, queryString) {
   `;
 
   const qInput = view.querySelector("#qInput");
-  const yearFromInput = view.querySelector("#yearFromInput");
-  const yearToInput = view.querySelector("#yearToInput");
+  const yearInput = view.querySelector("#yearInput");
   const industryRow = view.querySelector("#industryRow");
   const letterRow = view.querySelector("#letterRow");
   const resultsEl = view.querySelector("#results");
@@ -61,8 +57,7 @@ export async function renderMovies(view, queryString) {
     const p = new URLSearchParams();
     if (state.q) p.set("q", state.q);
     if (state.industry) p.set("industry", state.industry);
-    if (state.yearFrom) p.set("yearFrom", state.yearFrom);
-    if (state.yearTo) p.set("yearTo", state.yearTo);
+    if (state.year) p.set("year", state.year);
     if (state.actorLetter) p.set("actorLetter", state.actorLetter);
     const qs = p.toString();
     history.replaceState(null, "", `#/movies${qs ? "?" + qs : ""}`);
@@ -82,8 +77,8 @@ export async function renderMovies(view, queryString) {
     if (state.actorLetter) {
       list = list.filter((m) => (m.lead_actor || "").trim().charAt(0).toUpperCase() === state.actorLetter);
     }
-    if (state.yearFrom) list = list.filter((m) => (m.release_year ?? 0) >= Number(state.yearFrom));
-    if (state.yearTo) list = list.filter((m) => (m.release_year ?? 0) <= Number(state.yearTo));
+    // 4桁そろうまで絞り込まないのは、入力途中の「19」などで0件表示にならないようにするため
+    if (/^\d{4}$/.test(state.year)) list = list.filter((m) => m.release_year === Number(state.year));
     list = [...list].sort((a, b) => (b.release_year ?? 0) - (a.release_year ?? 0) || a.title.localeCompare(b.title));
 
     countEl.textContent = `${list.length}件`;
@@ -100,13 +95,8 @@ export async function renderMovies(view, queryString) {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(applyFilters, 200);
   });
-  yearFromInput.addEventListener("input", () => {
-    state.yearFrom = yearFromInput.value;
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(applyFilters, 200);
-  });
-  yearToInput.addEventListener("input", () => {
-    state.yearTo = yearToInput.value;
+  yearInput.addEventListener("input", () => {
+    state.year = yearInput.value;
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(applyFilters, 200);
   });
