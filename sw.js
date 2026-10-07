@@ -1,6 +1,6 @@
 // sw.js: オフライン閲覧のためのService Worker
 // データやコードを更新したら CACHE_VERSION を必ず上げること(上げ忘れると端末に古い版が残る)
-const CACHE_VERSION = "indian-cinema-history-v11";
+const CACHE_VERSION = "indian-cinema-history-v12";
 
 const PRECACHE_URLS = [
   "./",
@@ -23,7 +23,9 @@ async function precache(cache, urls) {
   await Promise.all(
     urls.map(async (url) => {
       try {
-        const response = await fetch(url);
+        // cache: "reload" でブラウザのHTTPキャッシュ(GitHub Pagesは10分有効)を飛ばす。
+        // 経由すると新しい版のキャッシュに古いJSが入り、cache-firstで出続けてしまうため
+        const response = await fetch(url, { cache: "reload" });
         if (response.ok && !response.redirected) {
           await cache.put(url, response);
         }
