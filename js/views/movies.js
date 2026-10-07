@@ -8,6 +8,8 @@ export async function renderMovies(view, queryString) {
   view.innerHTML = `<div class="loading">読み込み中...<br><span class="loading-hint">初回読み込みは通信環境によって時間がかかる場合があります</span></div>`;
   const { movies, industries } = await loadData();
   const params = new URLSearchParams(queryString || "");
+  // 選択肢はデータにある年だけにする(存在しない年を選んで0件になるのを防ぐため)
+  const years = [...new Set(movies.map((m) => m.release_year).filter(Boolean))].sort((a, b) => b - a);
 
   const state = {
     q: params.get("q") || "",
@@ -24,7 +26,10 @@ export async function renderMovies(view, queryString) {
       <input type="search" id="qInput" placeholder="タイトルで検索" value="${escapeHtml(state.q)}">
     </div>
     <div class="filter-bar year-filter">
-      <input type="number" id="yearInput" inputmode="numeric" placeholder="制作年(例: 1975)" value="${escapeHtml(state.year)}">
+      <select id="yearSelect" aria-label="制作年">
+        <option value="">制作年(すべて)</option>
+        ${years.map((y) => `<option value="${y}"${String(y) === state.year ? " selected" : ""}>${y}年</option>`).join("")}
+      </select>
     </div>
     <div class="filter-row" id="industryRow"></div>
     <p class="filter-label">主演俳優(頭文字)</p>
@@ -34,7 +39,7 @@ export async function renderMovies(view, queryString) {
   `;
 
   const qInput = view.querySelector("#qInput");
-  const yearInput = view.querySelector("#yearInput");
+  const yearSelect = view.querySelector("#yearSelect");
   const industryRow = view.querySelector("#industryRow");
   const letterRow = view.querySelector("#letterRow");
   const resultsEl = view.querySelector("#results");
@@ -77,8 +82,7 @@ export async function renderMovies(view, queryString) {
     if (state.actorLetter) {
       list = list.filter((m) => (m.lead_actor || "").trim().charAt(0).toUpperCase() === state.actorLetter);
     }
-    // 4桁そろうまで絞り込まないのは、入力途中の「19」などで0件表示にならないようにするため
-    if (/^\d{4}$/.test(state.year)) list = list.filter((m) => m.release_year === Number(state.year));
+    if (state.year) list = list.filter((m) => m.release_year === Number(state.year));
     list = [...list].sort((a, b) => (b.release_year ?? 0) - (a.release_year ?? 0) || a.title.localeCompare(b.title));
 
     countEl.textContent = `${list.length}件`;
@@ -95,10 +99,9 @@ export async function renderMovies(view, queryString) {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(applyFilters, 200);
   });
-  yearInput.addEventListener("input", () => {
-    state.year = yearInput.value;
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(applyFilters, 200);
+  yearSelect.addEventListener("change", () => {
+    state.year = yearSelect.value;
+    applyFilters();
   });
 
   industryRow.querySelectorAll(".chip[data-value]").forEach((btn) => {

@@ -116,7 +116,7 @@ img, svg { max-width: 100%; }
   font-size: 15px;
 }
 
-.year-filter input[type="number"] {
+.year-filter select {
   flex: 1;
   min-width: 0;
   min-height: 44px;
@@ -125,7 +125,7 @@ img, svg { max-width: 100%; }
   border: 1px solid var(--border);
   background: var(--bg-elevated);
   color: var(--text);
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .filter-label { color: var(--text-dim); font-size: 12px; margin: 4px 0 6px; }
